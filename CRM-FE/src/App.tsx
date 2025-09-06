@@ -9,7 +9,6 @@ import ProductTable from "./pages/Tables/productTables";
 import LeadTable from "./pages/Tables/LeadTables";
 import CustomerTable from "./pages/Tables/CustomerTables";
 import DealTable from "./pages/Tables/DealTables";
-import Home from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 export default function App() {
@@ -21,8 +20,7 @@ export default function App() {
           {/* Dashboard Layout */}
           <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
-
+            <Route index path="/" element={<ProductTable />} />
             <Route path="/user" element={<UserTable />} />
             <Route path="/data-produk" element={<ProductTable />} />
             <Route path="/leads" element={<LeadTable />} />

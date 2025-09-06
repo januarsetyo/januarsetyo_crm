@@ -68,4 +68,9 @@ npm install
 ### Jalankan server React
 
 npm run dev
+
+### Login Sebagai Manager hasil dari seeder
+Nama : Manager
+NIP : 0001
+Password : manager123
    

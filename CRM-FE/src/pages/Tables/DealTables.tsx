@@ -69,11 +69,12 @@ export default function DealTable() {
   const [newDealId, setNewDealId] = useState<number | null>(null);
 
   const [leads, setLeads] = useState<any[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
+  const [] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [selectedLead, setSelectedLead] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>({});
 
-  const [UserId, setUserId] = useState("");
+  const [] = useState("");
   const [leadId, setLeadId] = useState("");
   const [productId, setProductId] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -121,13 +122,6 @@ export default function DealTable() {
       .then((res) => setLeads(res.data || []));
   };
 
-  const fetchUsers = () => {
-    fetch(`${API_BASE}/user`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
-      .then((res) => res.json())
-      .then((res) => setUsers(res.data || []));
-  };
 
   const fetchProducts = () => {
     fetch(`${API_BASE}/product`, {
@@ -243,14 +237,15 @@ export default function DealTable() {
       url.searchParams.append("end_date", reportEnd);
     }
 
-    const res = await axios.get(url.toString(), {
+    const res = await axios.get<Blob>(url.toString(), {
       responseType: "blob",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
-    fileDownload(res.data, "laporan-deal.xlsx");
+    // res.data is a Blob when responseType is 'blob'
+    fileDownload(res.data as Blob, "laporan-deal.xlsx");
   } catch (error) {
     console.error("Download gagal:", error);
   }
@@ -328,11 +323,11 @@ export default function DealTable() {
       cell: ({ row }) => {
         const status = row.original.status;
         return status === "approved" ? (
-        <span class="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500">Approved</span>
+        <span className="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500">Approved</span>
         ) : status === "pending" ? (
-        <span class="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-error-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500">Pending</span>
+        <span className="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-error-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500">Pending</span>
         ) : status === "rejected" ? (
-        <span class="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500">Rejected</span>
+        <span className="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500">Rejected</span>
         ) : (
           <Badge>{status}</Badge>
         );
@@ -428,18 +423,22 @@ export default function DealTable() {
                     <TableCell
                       key={header.id}
                       isHeader
-                      className="text-center align-middle cursor-pointer select-none"
-                      onClick={header.column.getToggleSortingHandler()}
+                      className="text-center align-middle"
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() === "asc"
-                        ? " 🔼"
-                        : header.column.getIsSorted() === "desc"
-                        ? " 🔽"
-                        : null}
+                      <div
+                        className="cursor-pointer select-none"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc"
+                          ? " 🔼"
+                          : header.column.getIsSorted() === "desc"
+                          ? " 🔽"
+                          : null}
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -574,7 +573,12 @@ export default function DealTable() {
           <label className="block mb-1">Produk</label>
           <select
             value={productId}
-            onChange={(e) => setProductId(e.target.value)}
+              onChange={(e) => {
+              const val = e.target.value;
+              setProductId(val);
+              const prod = products.find((p) => p.id === Number(val));
+              setSelectedProduct(prod || {}); 
+            }}
             className="border rounded p-2 w-full"
           >
             <option value="">-- Pilih Produk --</option>
@@ -590,7 +594,7 @@ export default function DealTable() {
         <label className="block mb-1">Deskripsi Produk</label>
         <input
           type="text"
-          value={selectedLead.deskripsi || "-"}
+          value={selectedProduct.deskripsi || "-"}
           disabled
           className="border rounded p-2 w-full bg-gray-100"
         />
@@ -626,9 +630,8 @@ export default function DealTable() {
             value={negoPrice}
             onChange={(e) => {
               const val = e.target.value;
-              // hanya izinkan angka
               if (/^\d*$/.test(val)) {
-                setNegoPrice(val);
+                setNegoPrice(Number(val));
               }
             }}
             className="border rounded p-2 w-full"

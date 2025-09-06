@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);

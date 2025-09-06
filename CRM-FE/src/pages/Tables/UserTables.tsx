@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -108,7 +108,7 @@ export default function UserTable() {
         fetchUsers();
         closeModalAdd();
       })
-      .catch((err) => {
+      .catch((_err) => {
         closeModalAdd();
         showAlert("error", "Error", "Gagal tambah user, silahkan coba lagi dan cek form inputan anda");
       });
@@ -156,7 +156,7 @@ export default function UserTable() {
         fetchUsers();
         closeModalEdit();
       })
-      .catch((err) => {
+      .catch((_err) => {
         closeModalEdit();
         showAlert("error", "Error", "Gagal update user, silahkan coba lagi dan cek form inputan anda");
     
@@ -248,18 +248,22 @@ export default function UserTable() {
                     <TableCell
                       key={header.id}
                       isHeader
-                      className="text-center align-middle cursor-pointer select-none"
-                      onClick={header.column.getToggleSortingHandler()}
+                      className="text-center align-middle"
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() === "asc"
-                        ? " 🔼"
-                        : header.column.getIsSorted() === "desc"
-                        ? " 🔽"
-                        : null}
+                      <div
+                        className="cursor-pointer select-none inline-flex items-center justify-center"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc"
+                          ? " 🔼"
+                          : header.column.getIsSorted() === "desc"
+                          ? " 🔽"
+                          : null}
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>

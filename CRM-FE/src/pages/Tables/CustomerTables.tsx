@@ -133,9 +133,9 @@ export default function CustomerTable() {
     header: "Status",
     cell: ({ row }) =>
       row.original.is_active === 1 ? (
-        <span class="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500">Aktif</span>
+        <span className="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500">Aktif</span>
       ) : (
-        <span class="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500">Nonaktif</span>
+        <span className="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500">Nonaktif</span>
       ),
   },
   ];
@@ -178,18 +178,22 @@ export default function CustomerTable() {
                     <TableCell
                       key={header.id}
                       isHeader
-                      className="text-center align-middle cursor-pointer select-none"
-                      onClick={header.column.getToggleSortingHandler()}
+                      className="text-center align-middle"
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() === "asc"
-                        ? " 🔼"
-                        : header.column.getIsSorted() === "desc"
-                        ? " 🔽"
-                        : null}
+                      <div
+                        className="cursor-pointer select-none"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc"
+                          ? " 🔼"
+                          : header.column.getIsSorted() === "desc"
+                          ? " 🔽"
+                          : null}
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>

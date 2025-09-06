@@ -238,9 +238,9 @@ export default function LeadTable() {
     { accessorKey: "status", 
         header: "Status",
         cell: ({ row }) => row.original.status === "converted" ? (
-            <span class="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500">Converted</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500">Converted</span>
         ) : (
-            <span class="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500">Belum Aktif</span>   
+            <span className="inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium text-sm bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-500">Belum Aktif</span>   
         ),
         },
     ...(userRole === "sales"
@@ -248,7 +248,7 @@ export default function LeadTable() {
           {
             id: "actions",
             header: "Action",
-            cell: ({ row }) => (
+            cell: ({ row }: { row: { original: LeadType } }) => (
               <div className="flex justify-center gap-2">
                 <Button
                   size="sm"
@@ -317,18 +317,22 @@ export default function LeadTable() {
                     <TableCell
                       key={header.id}
                       isHeader
-                      className="text-center align-middle cursor-pointer select-none"
-                      onClick={header.column.getToggleSortingHandler()}
+                      className="text-center align-middle"
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() === "asc"
-                        ? " 🔼"
-                        : header.column.getIsSorted() === "desc"
-                        ? " 🔽"
-                        : null}
+                      <div
+                        className="cursor-pointer select-none"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc"
+                          ? " 🔼"
+                          : header.column.getIsSorted() === "desc"
+                          ? " 🔽"
+                          : null}
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>

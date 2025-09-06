@@ -235,7 +235,7 @@ const formatRupiah = (value: number | string) => {
           {
             id: "actions",
             header: "Action",
-            cell: ({ row }) => (
+            cell: ({ row }: { row: { original: ProductType } }) => (
               <div className="flex justify-center gap-2">
                 <Button size="sm" variant="primary" onClick={() => handleEditOpen(row.original)}>
                   Edit
@@ -293,18 +293,29 @@ const formatRupiah = (value: number | string) => {
                     <TableCell
                       key={header.id}
                       isHeader
-                      className="text-center align-middle cursor-pointer select-none"
-                      onClick={header.column.getToggleSortingHandler()}
+                      className="text-center align-middle"
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() === "asc"
-                        ? " 🔼"
-                        : header.column.getIsSorted() === "desc"
-                        ? " 🔽"
-                        : null}
+                      <div
+                        className="cursor-pointer select-none inline-block w-full"
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => header.column.getToggleSortingHandler()?.(e as any)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            header.column.getToggleSortingHandler()?.(e as any);
+                          }
+                        }}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc"
+                          ? " 🔼"
+                          : header.column.getIsSorted() === "desc"
+                          ? " 🔽"
+                          : null}
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>

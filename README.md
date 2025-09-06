@@ -26,57 +26,58 @@ Sistem **Customer Relationship Management (CRM)** adalah aplikasi berbasis **Lar
    git clone <url-repo>
    cd backend
 
-### Install Dependencies
-
-composer install
-
-### Salin file .env:
-
-cp .env.example .env
-
-
-### Sesuaikan konfigurasi database:
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=name_database
-DB_USERNAME=root
-DB_PASSWORD=
-
-### Generate Key, migrasi & seeder:
-
-php artisan key:generate
-php artisan migrate
-php artisan db:seed
-
-
-### Jalankan server Laravel:
-
-php artisan serve
+   ### Install Dependencies
+   
+   composer install
+   
+   ### Salin file .env:
+   
+   cp .env.example .env
+   
+   
+   ### Sesuaikan konfigurasi database:
+   
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=name_database
+   DB_USERNAME=root
+   DB_PASSWORD=
+   
+   ### Generate Key, migrasi & seeder:
+   
+   php artisan key:generate
+   php artisan migrate
+   php artisan db:seed
+   
+   
+   ### Jalankan server Laravel:
+   
+   php artisan serve
 
 
 ### 🔹 2. Frontend (React)
 **Clone repository:**
+```bash
    git clone <url-repo>
    cd frontend
 
-### Install Dependencies
-
-npm install
-
-### cek environment File di FE
-
-Apabila akan menggunakan local ataupun dari railway bisa disesuaikan dengan command salah satu, dan apabila port local berbeda bisa disesuaikan terlebih dahulu
-
-### Jalankan server React
-
-npm run dev
-
-### Login Sebagai Manager hasil dari seeder
-Nama : Manager
-NIP : 0001
-Password : manager123
+   ### Install Dependencies
+   
+   npm install
+   
+   ### cek environment File di FE
+   
+   Apabila akan menggunakan local ataupun dari railway bisa disesuaikan dengan command salah satu, dan apabila port local berbeda bisa disesuaikan terlebih dahulu
+   
+   ### Jalankan server React
+   
+   npm run dev
+   
+   ### Login Sebagai Manager hasil dari seeder
+   Nama : Manager
+   NIP : 0001
+   Password : manager123
 
 ### Hasil Deploy di Cloud Free Version
 crm-isp.vercel.app

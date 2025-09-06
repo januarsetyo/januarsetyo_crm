@@ -15,19 +15,16 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::get('/me', [AuthController::class, 'me']);
 
     
-Route::middleware(['auth:api', 'role:manager'])->prefix('manager')->group(function () {
-    Route::apiResource('lead', LeadController::class)->only(['index', 'show'])
-        ->names([
-            'index' => 'manager.lead.index',
-            'show'  => 'manager.lead.show',
-        ]);
+Route::middleware(['auth:api', 'role:manager'])->group(function () {
         Route::apiResource('user', UserController::class);
         Route::post('/deals/{id}/approve', [DealController::class, 'approve']);     
     });
 
 Route::middleware(['auth:api', 'role:sales'])->group(function () {
         Route::apiResource(('product'), ProductController::class);
-        Route::apiResource(('lead'), LeadController::class);
+        Route::post('/lead', [LeadController::class, 'store']);
+        Route::put('/lead/{id}', [LeadController::class, 'update']);
+        Route::delete('/lead/{id}', [LeadController::class, 'destroy']);
         Route::apiResource(('customer'), CustomerController::class);
         Route::post('/deals', [DealController::class, 'store']);
         Route::post('/deals/{deal}/details', [DealDetailController::class, 'store']);
@@ -35,6 +32,8 @@ Route::middleware(['auth:api', 'role:sales'])->group(function () {
 });
 
 Route::middleware(['auth:api', 'role:manager,sales'])->group(function () {
+        Route::get('/lead', [LeadController::class, 'index']);
+        Route::get('/lead/{id}', [LeadController::class, 'show']);
         Route::get('/product', [ProductController::class, 'index']);
         Route::get('/deals', [DealController::class, 'index']);
         Route::get('/customers', [CustomerController::class, 'index']);

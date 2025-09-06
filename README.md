@@ -65,7 +65,7 @@ php artisan serve
 
 npm install
 
-### cek environment
+### cek environment File di FE
 
 Apabila akan menggunakan local ataupun dari railway bisa disesuaikan dengan command salah satu, dan apabila port local berbeda bisa disesuaikan terlebih dahulu
 

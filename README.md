@@ -77,4 +77,7 @@ npm run dev
 Nama : Manager
 NIP : 0001
 Password : manager123
+
+### Hasil Deploy di Cloud Free Version
+crm-isp.vercel.app
    

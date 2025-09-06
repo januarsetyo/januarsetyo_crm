@@ -26,6 +26,10 @@ Sistem **Customer Relationship Management (CRM)** adalah aplikasi berbasis **Lar
 
 npm install
 
+### cek environment
+
+Apabila akan menggunakan local ataupun dari railway bisa disesuaikan dengan command salah satu, dan apabila port local berbeda bisa disesuaikan terlebih dahulu
+
 ### Jalankan server React
 
 npm run dev

@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     {
         User::create([
             'name' => 'Manager', 
-            'nip' => '0000000001',
+            'nip' => '0001',
             'password' => Hash::make('manager123'), 
             'role' => 'manager', 
         ]);    

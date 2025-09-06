@@ -33,6 +33,7 @@ interface LeadType {
 }
 
 export default function LeadTable() {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const [leads, setLeads] = useState<LeadType[]>([]);
   const [selectedLead, setSelectedLead] = useState<LeadType | null>(null);
   const [formData, setFormData] = useState<{
@@ -84,8 +85,8 @@ export default function LeadTable() {
   const fetchLeads = () => {
     const url =
       userRole === "manager"
-        ? "http://127.0.0.1:8000/api/manager/lead"
-        : "http://127.0.0.1:8000/api/lead";
+        ? `${API_BASE}/lead`
+        : `${API_BASE}/lead`;
 
     fetch(url, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -99,7 +100,7 @@ export default function LeadTable() {
   };
 
   const fetchUserRole = () => {
-    fetch("http://127.0.0.1:8000/api/me", {
+    fetch(`${API_BASE}/me`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -132,7 +133,7 @@ export default function LeadTable() {
   };
 
   const handleAddSave = () => {
-    fetch("http://127.0.0.1:8000/api/lead", {
+    fetch(`${API_BASE}/lead`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -179,7 +180,7 @@ export default function LeadTable() {
   const handleEditSave = () => {
     if (!selectedLead) return;
 
-    fetch(`http://127.0.0.1:8000/api/lead/${selectedLead.id}`, {
+    fetch(`${API_BASE}/lead/${selectedLead.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -212,7 +213,7 @@ export default function LeadTable() {
 
   const handleDelete = (id: number) => {
     if (!confirm("Apakah yakin ingin menghapus lead ini?")) return;
-    fetch(`http://127.0.0.1:8000/api/lead/${id}`, {
+    fetch(`${API_BASE}/lead/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
@@ -303,6 +304,11 @@ export default function LeadTable() {
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="max-w-full overflow-x-auto">
+          {leads.length === 0 ? (
+          <div className="py-6 text-center text-gray-500 font-medium">
+            Data tidak ada
+          </div>
+        ) : (
           <Table>
             <TableHeader className="border-b border-gray-100">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -318,10 +324,11 @@ export default function LeadTable() {
                         header.column.columnDef.header,
                         header.getContext()
                       )}
-                      {{
-                        asc: " 🔼",
-                        desc: " 🔽",
-                      }[header.column.getIsSorted() as string] ?? null}
+                      {header.column.getIsSorted() === "asc"
+                        ? " 🔼"
+                        : header.column.getIsSorted() === "desc"
+                        ? " 🔽"
+                        : null}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -335,15 +342,19 @@ export default function LeadTable() {
                       key={cell.id}
                       className="text-center align-middle"
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
+        )}
       </div>
+    </div>
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">

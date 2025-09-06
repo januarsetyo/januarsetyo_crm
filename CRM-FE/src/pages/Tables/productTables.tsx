@@ -26,6 +26,7 @@ interface ProductType {
 }
 
 export default function ProductTable() {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const [products, setProducts] = useState<ProductType[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
   const [formData, setFormData] = useState<{
@@ -78,7 +79,7 @@ const formatRupiah = (value: number | string) => {
   };
 
   const fetchProducts = () => {
-    fetch("http://127.0.0.1:8000/api/product", {
+    fetch(`${API_BASE}/product`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -90,7 +91,7 @@ const formatRupiah = (value: number | string) => {
   };
 
   const fetchUserRole = () => {
-    fetch("http://127.0.0.1:8000/api/me", {
+    fetch(`${API_BASE}/me`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -111,7 +112,7 @@ const formatRupiah = (value: number | string) => {
   };
 
   const handleAddSave = () => {
-    fetch("http://127.0.0.1:8000/api/product", {
+    fetch(`${API_BASE}/product`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -161,7 +162,7 @@ const formatRupiah = (value: number | string) => {
   const handleEditSave = () => {
     if (!selectedProduct) return;
 
-    fetch(`http://127.0.0.1:8000/api/product/${selectedProduct.id}`, {
+    fetch(`${API_BASE}/product/${selectedProduct.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -198,7 +199,7 @@ const formatRupiah = (value: number | string) => {
 
   const handleDelete = (id: number) => {
     if (!confirm("Apakah yakin ingin menghapus product ini?")) return;
-    fetch(`http://127.0.0.1:8000/api/product/${id}`, {
+    fetch(`${API_BASE}/product/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
@@ -279,6 +280,11 @@ const formatRupiah = (value: number | string) => {
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="max-w-full overflow-x-auto">
+          {products.length === 0 ? (
+          <div className="py-6 text-center text-gray-500 font-medium">
+            Data tidak ada
+          </div>
+        ) : (
           <Table>
             <TableHeader className="border-b border-gray-100">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -290,11 +296,15 @@ const formatRupiah = (value: number | string) => {
                       className="text-center align-middle cursor-pointer select-none"
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      {{
-                        asc: " 🔼",
-                        desc: " 🔽",
-                      }[header.column.getIsSorted() as string] ?? null}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                      {header.column.getIsSorted() === "asc"
+                        ? " 🔼"
+                        : header.column.getIsSorted() === "desc"
+                        ? " 🔽"
+                        : null}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -304,16 +314,23 @@ const formatRupiah = (value: number | string) => {
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-center align-middle">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <TableCell
+                      key={cell.id}
+                      className="text-center align-middle"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
+        )}
       </div>
+    </div>
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">

@@ -7,6 +7,7 @@ import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 
 export default function SignInForm() {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [nip, setNip] = useState("");       
@@ -27,7 +28,7 @@ export default function SignInForm() {
     setError(null);
 
     try {
-      const res = await axios.post<LoginResponse>("http://localhost:8000/api/login", {
+      const res = await axios.post<LoginResponse>(`${API_BASE}/login`, {
         name,
         nip,
         password,

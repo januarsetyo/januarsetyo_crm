@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -26,6 +26,7 @@ interface UserType {
 
 
 export default function UserTable() {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const [users, setUsers] = useState<UserType[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [formData, setFormData] = useState<{
@@ -62,7 +63,7 @@ export default function UserTable() {
 
 
   const fetchUsers = () => {
-    fetch("http://127.0.0.1:8000/api/user", {
+    fetch(`${API_BASE}/user`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -82,7 +83,7 @@ export default function UserTable() {
   };
 
   const handleAddSave = () => {
-    fetch("http://127.0.0.1:8000/api/user", {
+    fetch(`${API_BASE}/user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,7 +94,7 @@ export default function UserTable() {
       .then(async (res) => {
         const data = await res.json().catch(() => null);
         if (!res.ok) {
-                    let errorMsg = data?.message || "Gagal tambah user";
+        let errorMsg = data?.message || "Gagal tambah user";
         if (data?.errors) {
           const firstError = Object.values(data.errors)[0] as string[];
           errorMsg = firstError[0] || errorMsg;
@@ -130,7 +131,7 @@ export default function UserTable() {
     };
     if (formData.password.trim() !== "") payload.password = formData.password;
 
-    fetch(`http://127.0.0.1:8000/api/user/${selectedUser.id}`, {
+    fetch(`${API_BASE}/user/${selectedUser.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -165,7 +166,7 @@ export default function UserTable() {
  
   const handleDelete = (id: number) => {
     if (!confirm("Apakah yakin ingin menghapus user ini?")) return;
-    fetch(`http://127.0.0.1:8000/api/user/${id}`, {
+    fetch(`${API_BASE}/user/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
@@ -234,6 +235,11 @@ export default function UserTable() {
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="max-w-full overflow-x-auto">
+          {users.length === 0 ? (
+          <div className="py-6 text-center text-gray-500 font-medium">
+            Data tidak ada
+          </div>
+        ) : (
           <Table>
             <TableHeader className="border-b border-gray-100">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -245,11 +251,15 @@ export default function UserTable() {
                       className="text-center align-middle cursor-pointer select-none"
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      {{
-                        asc: " 🔼",
-                        desc: " 🔽",
-                      }[header.column.getIsSorted() as string] ?? null}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                      {header.column.getIsSorted() === "asc"
+                        ? " 🔼"
+                        : header.column.getIsSorted() === "desc"
+                        ? " 🔽"
+                        : null}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -259,16 +269,23 @@ export default function UserTable() {
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-center align-middle">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <TableCell
+                      key={cell.id}
+                      className="text-center align-middle"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
+        )}
       </div>
+    </div>
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">

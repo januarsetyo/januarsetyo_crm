@@ -6,6 +6,7 @@ export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; nip: string } | null>(null);
   const navigate = useNavigate();
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -20,7 +21,7 @@ export default function UserDropdown() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch("http://127.0.0.1:8000/api/me", {
+    fetch(`${API_BASE}/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -36,7 +37,7 @@ export default function UserDropdown() {
       return;
     }
 
-    fetch("http://127.0.0.1:8000/api/logout", {
+    fetch(`${API_BASE}/logout`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     })

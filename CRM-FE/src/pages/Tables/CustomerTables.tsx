@@ -17,7 +17,6 @@ import {
 } from "../../components/ui/table";
 import Button from "../../components/ui/button/Button";
 import Alert from "../../components/ui/alert/Alert";
-import Badge from "../../components/ui/badge/Badge";
 
 interface CustomerType {
   id: number;
@@ -41,6 +40,7 @@ interface CustomerType {
 }
 
 export default function CustomerTable() {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const [customers, setCustomers] = useState<CustomerType[]>([]);
   const [alert, setAlert] = useState<{
     variant: "success" | "error";
@@ -63,8 +63,8 @@ export default function CustomerTable() {
   const fetchCustomers = () => {
     const url =
       userRole === "manager"
-        ? "http://127.0.0.1:8000/api/customers"
-        : "http://127.0.0.1:8000/api/customer";
+        ? `${API_BASE}/customers`
+        : `${API_BASE}/customers`;
 
     fetch(url, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -81,7 +81,7 @@ export default function CustomerTable() {
   };
 
   const fetchUserRole = () => {
-    fetch("http://127.0.0.1:8000/api/me", {
+    fetch(`${API_BASE}/me`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -163,8 +163,13 @@ export default function CustomerTable() {
       )}
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-        <div className="max-w-full overflow-x-auto">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="max-w-full overflow-x-auto">
+        {customers.length === 0 ? (
+          <div className="py-6 text-center text-gray-500 font-medium">
+            Data tidak ada
+          </div>
+        ) : (
           <Table>
             <TableHeader className="border-b border-gray-100">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -198,15 +203,19 @@ export default function CustomerTable() {
                       key={cell.id}
                       className="text-center align-middle"
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
+        )}
       </div>
+    </div>
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">

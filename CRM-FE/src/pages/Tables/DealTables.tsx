@@ -27,6 +27,10 @@ interface DealDetail {
   product: {
     id: number;
     nama_product: string;
+    deskripsi: string;
+    hpp: number;
+    margin: number;
+    price: number;
   };
   quantity: number;
   negotiated_price: number;
@@ -49,6 +53,7 @@ interface Deal {
 }
 
 export default function DealTable() {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const [deals, setDeals] = useState<Deal[]>([]);
   const [userRole, setUserRole] = useState<string>("");
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -89,7 +94,7 @@ export default function DealTable() {
   };
 
   const fetchUserRole = () => {
-    fetch("http://127.0.0.1:8000/api/me", {
+    fetch(`${API_BASE}/me`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -98,7 +103,7 @@ export default function DealTable() {
   };
 
   const fetchDeals = () => {
-    fetch("http://127.0.0.1:8000/api/deals", {
+    fetch(`${API_BASE}/deals`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -109,7 +114,7 @@ export default function DealTable() {
   };
 
   const fetchLeads = () => {
-    fetch("http://127.0.0.1:8000/api/lead", {
+    fetch(`${API_BASE}/lead`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -117,7 +122,7 @@ export default function DealTable() {
   };
 
   const fetchUsers = () => {
-    fetch("http://127.0.0.1:8000/api/user", {
+    fetch(`${API_BASE}/user`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -125,7 +130,7 @@ export default function DealTable() {
   };
 
   const fetchProducts = () => {
-    fetch("http://127.0.0.1:8000/api/product", {
+    fetch(`${API_BASE}/product`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
@@ -143,7 +148,7 @@ export default function DealTable() {
   }, [userRole]);
 
   const handleApprove = (id: number, status: "approved" | "rejected") => {
-    fetch(`http://127.0.0.1:8000/api/deals/${id}/approve`, {
+    fetch(`${API_BASE}/deals/${id}/approve`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -169,7 +174,7 @@ export default function DealTable() {
     }).format(value);
 
   const handleCreateDeal = async () => {
-    const res = await fetch("http://127.0.0.1:8000/api/deals", {
+    const res = await fetch(`${API_BASE}/deals`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -180,16 +185,18 @@ export default function DealTable() {
     const data = await res.json();
     if (res.ok) {
       setNewDealId(data.deal.id);
-      setStep(2);
-    } else {
-      showAlert("error", "Error", data.message || "Failed create deal");
-    }
-  };
+    const lead = leads.find((l) => l.id === Number(leadId));
+    setSelectedLead(lead || null);
+    setStep(2);
+  } else {
+    showAlert("error", "Error", data.message || "Failed create deal");
+  }
+};
 
   const handleAddDetail = async () => {
     if (!newDealId) return;
     const res = await fetch(
-      `http://127.0.0.1:8000/api/deals/${newDealId}/details`,
+      `${API_BASE}/deals/${newDealId}/details`,
       {
         method: "POST",
         headers: {
@@ -230,7 +237,7 @@ export default function DealTable() {
 
     const handleDownloadReport = async () => {
   try {
-    const url = new URL("http://127.0.0.1:8000/api/reports/deals/export");
+    const url = new URL(`${API_BASE}/reports/deals/export`);
     if (reportStart && reportEnd) {
       url.searchParams.append("start_date", reportStart);
       url.searchParams.append("end_date", reportEnd);
@@ -265,9 +272,20 @@ export default function DealTable() {
       accessorKey: "deal_details",
       header: "Nama Produk",
       cell: ({ row }) => (
-        <div className="flex flex-col gap-1 text-left">
+        <div className="flex flex-col gap-1 text-center">
           {row.original.deal_details.map((d) => (
             <span key={d.id}>{d.product?.nama_product}</span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "deal_details",
+      header: "Harga Produk",
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1 text-center">
+          {row.original.deal_details.map((d) => (
+            <span key={d.id}>{formatRupiah(d.product?.price || 0)}</span>
           ))}
         </div>
       ),
@@ -397,6 +415,11 @@ export default function DealTable() {
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="max-w-full overflow-x-auto">
+          {deals.length === 0 ? (
+          <div className="py-6 text-center text-gray-500 font-medium">
+            Data tidak ada
+          </div>
+        ) : (
           <Table>
             <TableHeader className="border-b border-gray-100">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -440,8 +463,9 @@ export default function DealTable() {
               ))}
             </TableBody>
           </Table>
-        </div>
+        )}
       </div>
+    </div>
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">
@@ -504,13 +528,13 @@ export default function DealTable() {
     {step === 1 ? (
       <div className="grid grid-cols-1 gap-4">
         <div>
-          <label className="block mb-1">Lead</label>
+          <label className="block mb-1">Calon Customer</label>
           <select
             value={leadId}
             onChange={(e) => setLeadId(e.target.value)}
             className="border rounded p-2 w-full"
           >
-            <option value="">-- Pilih Lead --</option>
+            <option value="">-- Pilih Calon Customer --</option>
             {leads.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.nama}
@@ -563,6 +587,16 @@ export default function DealTable() {
         </div>
 
         <div>
+        <label className="block mb-1">Deskripsi Produk</label>
+        <input
+          type="text"
+          value={selectedLead.deskripsi || "-"}
+          disabled
+          className="border rounded p-2 w-full bg-gray-100"
+        />
+      </div>
+
+        <div>
         <label className="block mb-1">Harga Produk</label>
         <input
           type="text"
@@ -588,10 +622,15 @@ export default function DealTable() {
         <div>
           <label className="block mb-1">Harga dari customer</label>
           <input
-            type="number"
-            min={0}
+            type="text"
             value={negoPrice}
-            onChange={(e) => setNegoPrice(Number(e.target.value))}
+            onChange={(e) => {
+              const val = e.target.value;
+              // hanya izinkan angka
+              if (/^\d*$/.test(val)) {
+                setNegoPrice(val);
+              }
+            }}
             className="border rounded p-2 w-full"
           />
         </div>
